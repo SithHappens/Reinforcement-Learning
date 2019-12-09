@@ -41,3 +41,12 @@ class ReplayBuffer:
     def clear(self):
         self.buffer.clear()
         self.count = 0
+
+
+
+if __name__ == '__main__':
+    memory = ReplayBuffer(1e6)
+
+    memory.add(1, 2, 3, False, 4)
+
+    print(memory.sample(1))
