@@ -27,6 +27,8 @@ class Agent:
 
         self.writer = SummaryWriter(comment=writer_comment)
 
+        self.softmax = nn.Softmax(dim=1)
+
     def __del__(self):
         self.writer.close()
 
@@ -40,11 +42,9 @@ class Agent:
 
         state = self.env.reset()
 
-        softmax = nn.Softmax(dim=1)
-
         while True:
             state_v = torch.FloatTensor([state])
-            action_probs = softmax(self.net(state_v)).data.numpy()[0]
+            action_probs = self.softmax(self.net(state_v)).data.numpy()[0]
             action = np.random.choice(len(action_probs), p=action_probs)
 
             next_state, reward, done, _ = self.env.step(action)
@@ -109,11 +109,10 @@ class Agent:
         state = self.env.reset()
         self.env.render()
         done = False
-        softmax = nn.Softmax(dim=1)
 
         while not done:
             state_v = torch.FloatTensor([state])
-            action_probs = softmax(self.net(state_v)).data.numpy()[0]
+            action_probs = self.softmax(self.net(state_v)).data.numpy()[0]
             action = np.argmax(action_probs)
 
             if action is None:
@@ -135,8 +134,8 @@ class NeuralNetwork(nn.Module):
         self.net = nn.Sequential(
                 nn.Linear(n_state, n_hidden),
                 nn.ReLU(),
-                nn.Linear(n_hidden, n_actions)
-                # softmax non-linearity is in the agents code
+                nn.Linear(n_hidden, n_actions),
+                #nn.Softmax(dim=1)  # softmax outsourced trains faster!
         )
 
     def forward(self, x):
@@ -151,7 +150,7 @@ if __name__ == "__main__":
 
     net = NeuralNetwork(n_state=env.observation_space.shape[0], n_hidden=128, n_actions=env.action_space.n)
 
-    agent = Agent(env, net, writer_comment='-ant')
+    agent = Agent(env, net, writer_comment='-cartpole -softmax_outside')
     agent.train()
 
     for i in range(10):
