@@ -1,4 +1,4 @@
-# Reinforcement Learning Arena
+# Reinforcement Learning
 
 - **model-free**
 	- no model of the environment or reward, current states are directly connected to actions (or values).
