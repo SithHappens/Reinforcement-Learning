@@ -79,5 +79,5 @@ class AgentTools:
 
             self.env.render()
 
-        #self.env.close()
+        self.env.close()
 

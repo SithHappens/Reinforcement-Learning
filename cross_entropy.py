@@ -6,7 +6,11 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.cuda import FloatTensor, LongTensor
+
+if torch.cuda.is_available():
+    from torch.cuda import FloatTensor, LongTensor    # TODO use .to(device)
+else:
+    from torch import FloatTensor, LongTensor
 
 from utils import AgentTools, Episode, EpisodeStep
 
@@ -15,7 +19,7 @@ class NeuralNetwork(nn.Module):
     ''' Neural Network mapping observations to a policy.
     '''
     
-    def __init__(self, n_state, n_hidden, n_actions):
+    def __init__(self, n_state, n_hidden, n_actions, use_gpu=torch.cuda.is_available()):
         super().__init__()
 
         self.net = nn.Sequential(
@@ -23,7 +27,9 @@ class NeuralNetwork(nn.Module):
             nn.ReLU(),
             nn.Linear(n_hidden, n_actions),
         )
-        self.net.cuda()
+        
+        if use_gpu:
+            self.net.cuda()  # TODO use .to(device)
 
     def forward(self, x):
         return self.net(x)
@@ -43,7 +49,7 @@ class Agent (AgentTools):
         self.softmax = nn.Softmax(dim=1)
 
     def action_probabilities(self, state):
-        state_tensor = FloatTensor([state])
+        state_tensor = FloatTensor([state])    # TODO use .to(device)
         action_probs = self.softmax(self.net(state_tensor)).cpu().data.numpy()[0]
         return action_probs
 
@@ -72,7 +78,7 @@ class Agent (AgentTools):
             train_observations.extend(map(lambda step: step.state, episode.steps))
             train_actions.extend(map(lambda step: step.action, episode.steps))
 
-        return FloatTensor(train_observations), LongTensor(train_actions), reward_bound, reward_mean
+        return FloatTensor(train_observations), LongTensor(train_actions), reward_bound, reward_mean    # TODO use .to(device)
 
     def train(self, percentile=70):
         experience = self.collect_experience(policy=self.exploration_policy, batch_size=16)
@@ -100,17 +106,18 @@ class Agent (AgentTools):
 if __name__ == '__main__':
     import gym
 
-    '''
+    
     env = gym.make('CartPole-v1')
     net = NeuralNetwork(n_state=env.observation_space.shape[0], n_hidden=128, n_actions=env.action_space.n)
-    agent = Agent(env, net, reward_solved=200, writer_comment='-lunar_lander')
+    agent = Agent(env, net, reward_solved=200, writer_comment='-cart pole')
     agent.train()
+    
     '''
-
     env = gym.make('LunarLander-v2')
     net = NeuralNetwork(n_state=env.observation_space.shape[0], n_hidden=128, n_actions=env.action_space.n)
     agent = Agent(env, net, reward_solved=200, writer_comment='-lunar_lander')
     agent.train()
+    '''
 
     for i in range(10):
         agent.run()
