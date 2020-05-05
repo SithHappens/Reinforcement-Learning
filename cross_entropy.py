@@ -106,11 +106,19 @@ class Agent (AgentTools):
 if __name__ == '__main__':
     import gym
 
+    if True:
+        env = gym.make('CartPole-v1')
+        net = NeuralNetwork(n_state=env.observation_space.shape[0], n_hidden=128, n_actions=env.action_space.n)
+        agent = Agent(env, net, reward_solved=200, writer_comment='-cart pole')
+        agent.train()
     
-    env = gym.make('CartPole-v1')
-    net = NeuralNetwork(n_state=env.observation_space.shape[0], n_hidden=128, n_actions=env.action_space.n)
-    agent = Agent(env, net, reward_solved=200, writer_comment='-cart pole')
-    agent.train()
+    if False:
+        # Naive Version, net converges but reward doesn't increase
+        from utils import DiscreteOneHotWrapper
+        env = DiscreteOneHotWrapper(gym.make('FrozenLake-v0'))
+        net = NeuralNetwork(n_state=env.observation_space.shape[0], n_hidden=128, n_actions=env.action_space.n)
+        agent = Agent(env, net, reward_solved=0.8, writer_comment='-FrozenLake')
+        agent.train()
     
     '''
     env = gym.make('LunarLander-v2')
