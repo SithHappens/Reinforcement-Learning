@@ -122,3 +122,6 @@ Inherited from the MDP formalism: Observation from the environment is all that w
 Single-frame pong for example is POMDP, because direction of the ball is not known. Also card games cause opponents hand is unknown.
 
 Hack: Chain k consecutive observations together as the state, so dynamics can be deducted.
+
+**Speed**  
+Naive Implementation of the loss, which loops over every batch sample, is 2x slower than a parallel implementation. A single extra copy of the data batch could slow the same code 13x.  
