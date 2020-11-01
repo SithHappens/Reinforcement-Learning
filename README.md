@@ -125,3 +125,32 @@ Hack: Chain k consecutive observations together as the state, so dynamics can be
 
 **Speed**  
 Naive Implementation of the loss, which loops over every batch sample, is 2x slower than a parallel implementation. A single extra copy of the data batch could slow the same code 13x.  
+
+## Actor-Critic
+
+- Actor approximates policy &pi;
+- Critic approximates V(s)
+- Actor-Critic methods aren't really stable, but a stepping stone for more advanced methods
+
+> **Temporal difference** &delta; = R<sub>t</sub> + &gamma;V(S<sub>t+1</sub>) - V(S<sub>t</sub>)  
+>
+> Critic Loss = &delta;<sup>2</sup>  
+> Actor Loss = &delta; ln &pi;(A<sub>t</sub>|S<sub>t</sub>)
+
+> **Algorithm**
+> 
+> Initialize Actor-Critic-Network  
+> Repeat for large number of episodes:  
+> * Reset environment, score, terminal flag  
+> * While state is not terminal  
+>   - Select action according to actor network  
+>   - Take action, receive reward and new state  
+>   - &delta; = R<sub>t</sub> + &gamma; V(S<sub>t+1</sub>)-V(S<sub>t</sub>)  
+> * Plot scores over time for evidence of learning  
+
+**Implementation Details**
+
+- use one network, common lower layers (input), two outputs, no need to train two networks to understand the environment
+- Softmax activation for actor and categorical distribution
+
+

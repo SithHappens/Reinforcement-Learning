@@ -1,3 +1,4 @@
 {
-    "python.pythonPath": "/home/stephan/Dokumente/python_venv/ai/bin/python"
+    "python.pythonPath": "/home/stephan/Dokumente/python_venv/ai/bin/python",
+    "python.linting.pylintArgs": ["--ignored-modules=tensorflow.keras"]
 }
